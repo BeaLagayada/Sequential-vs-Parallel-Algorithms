@@ -7,21 +7,29 @@ This project explores the performance differences between sequential and paralle
 ```bash
 python main_runner.py
 ```
+## Result Summary
+### Sorting
+Parallel sorting struggled on small datasets across all three cases, with speedups as low as 0.01 on random data, meaning the sequential version was significantly faster. This is expected since the cost of spawning processes outweighs any benefit on only 1,000 elements. Things shifted at the medium size where parallel sorting started pulling ahead, reaching a speedup of 1.75 on random data. On the large dataset, both approaches performed similarly with speedups hovering around 1.0, suggesting that at this scale the merging step limits further parallel gains.
+### Searching
+Parallel search was consistently slower than sequential across every single test case. Even on the large dataset, the best speedup recorded was only 0.41 on reverse sorted data. This tells us that linear search is simply too lightweight of an operation to benefit from parallelism. The time spent creating processes and coordinating through a Queue far exceeded the time it would have taken to just scan the list directly. Sequential search was the clear winner here across all sizes and arrangements.
+### Overall Takeaway
+Parallelism showed the most promise in sorting large and medium random datasets, but offered little to no advantage for searching at any scale. The results confirm that parallel execution is not universally better and its effectiveness depends heavily on whether the workload is large and complex enough to justify the coordination overhead.
+
 ---
 
 # REFLECTION AND ANALYSIS
 
-## Roger Bao  Jr.
+### Roger Bao  Jr.
 Working through the parallel merge sort implementation made it clear just how differently sequential and parallel execution approach the same problem. Sequential sorting follows a straightforward recursive flow, while parallel sorting breaks data into chunks, processes them simultaneously, and merges them at the end. Performance-wise, parallel sorting wasn't automatically better since for small inputs, process overhead actually made it slower, and the speedups only became noticeable around 100,000 to 1,000,000 elements. The trickiest part was merging sorted chunks efficiently without losing the gains from parallelism, and knowing when not to parallelize was just as important as knowing when to. Overall, parallelism earns its keep on large datasets and multi-core systems, but for small inputs or resource-constrained environments, it's more trouble than it's worth.
 
-## Bea Lagayada
+### Bea Lagayada
 As the person responsible for generating the datasets and building the main test, the difference between the two types of executions is the tradeoff between speed and overhead. It is clear that parallel executions had superior performance compared to sequential ones when dealing with big data sets. However, for small-sized data sets, the additional overhead involved in process creation caused the parallel version to be slower. The increase in speed can be easily observed as the amount of data grows, which is evident from the speedup achieved by the parallel version at medium and large data set sizes. However, one of the difficulties I encountered during the project was how to incorporate each team member’s implementation into the whole project smoothly. Additionally, I have learned that there is an overhead in a parallel system, and synchronization should be done properly. Even merge within parallel sort may turn out to be sequential. 
 
-## Mariel Laplap 
+### Mariel Laplap 
 Working on sequential (linear) search helped me understand its role as a simple baseline for comparing performance with parallel approaches. I observed that while linear search is efficient for small datasets, its execution time becomes more noticeable as the dataset size increases since it checks each element one by one. Compared to the parallel version, the difference in speed becomes clearer with larger inputs, where dividing the task can reduce overall search time. This experience showed me that although sequential search is straightforward, it is not always the most efficient choice for large-scale problems.
 
-## Thomas Gabriel D. Martinez
+### Thomas Gabriel D. Martinez
 My part in this project was handling the sequential search, which turned out to be a good way to understand how a simple algorithm behaves under pressure. The logic itself is nothing complicated, just checking each element in order until the target shows up or the list runs out. Testing it across different sizes is where it got more revealing. Smaller datasets finished without any issues, but once the list hit 1,000,000 elements and the target was sitting at the end or missing completely, the slowdown was obvious. Stacking it up against the parallel version showed something I did not expect at first, which was that sequential actually won on the small dataset. The cost of creating processes, splitting the data, and coordinating through a Queue simply was not worth it for 1,000 elements. The parallel version only started making sense on the larger datasets where the workload was heavy enough to justify all that setup. The lesson I got from this is that more complexity does not always mean better performance, and for a task as quick as a single comparison, parallelism only becomes useful when the scale is large enough to absorb the extra cost.
 
-## Cydney S. Ruelo
+### Cydney S. Ruelo
 The task demonstrated to me how sequential execution and parallel execution operate as two distinct methods of execution. The most important lesson I received showed me that using parallel processing does not provide immediate performance improvements. The system demonstrates a performance drop because the need to establish new processes and handle data exchange along with result synchronization demands actual processing duration. My two biggest problems included combining parallel sorting functionality with my system and creating a method to end all active processes in my parallel search system once it discovered a matching item. This demonstrated to me that managing several workers presents greater difficulties compared to performing both sorting and searching tasks. The pattern has become apparent to me. When tasks need extensive resources to complete their work then parallel processing becomes useful but sequential processing remains more efficient for smaller tasks. This showed me how to choose the most suitable tools for my work instead of selecting the most impressive tools.
