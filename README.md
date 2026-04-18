@@ -1,13 +1,13 @@
 # Sequential vs Parallel Algorithms – Group Project
 
-## Overview
+## OVERVIEW
 This project explores the performance differences between sequential and parallel algorithms by implementing both a sorting algorithm (merge sort) and a searching algorithm (linear search) in Python. Using the multiprocessing module, the parallel versions divide the dataset into chunks that are processed concurrently, while the sequential versions handle everything in a single linear flow. Each algorithm is tested across three dataset sizes (1,000, 100,000, and 1,000,000 elements) and three data arrangements (random, sorted, and reverse sorted) to observe how execution time and efficiency change under different conditions. The goal is to understand not just how these algorithms work, but when parallelism actually helps and when it just adds unnecessary overhead.
 
-## How to Run
+## HOW TO RUN
 ```bash
 python main_runner.py
 ```
-## Result Summary
+## RESULT SUMMARY
 ### Sorting
 Parallel sorting struggled on small datasets across all three cases, with speedups as low as 0.01 on random data, meaning the sequential version was significantly faster. This is expected since the cost of spawning processes outweighs any benefit on only 1,000 elements. Things shifted at the medium size where parallel sorting started pulling ahead, reaching a speedup of 1.75 on random data. On the large dataset, both approaches performed similarly with speedups hovering around 1.0, suggesting that at this scale the merging step limits further parallel gains.
 ### Searching
