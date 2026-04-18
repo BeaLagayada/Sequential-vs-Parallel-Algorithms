@@ -1,39 +1,39 @@
 from multiprocessing import Process, Queue
 
-def worker(sub_data, target, q, offset):
-    """Search sub_data for target; put (found_index, global_index) into queue."""
-    for local_idx, val in enumerate(sub_data):
-        if val == target:
-            q.put((offset + local_idx, True))
-            return
-    q.put((None, False))   # not found in this chunk
 
-def parallel_search(data, target, num_processes=4):
-    """Return first global index of target, or -1 if not found."""
-    chunk_size = max(1, len(data) // num_processes)
-    chunks = []
-    offsets = []
-    for i in range(0, len(data), chunk_size):
-        chunks.append(data[i:i+chunk_size])
-        offsets.append(i)
-    
+def search_chunk(sub_data, target, q, offset):
+    # scan this slice and report back through the queue
+    for local_i, val in enumerate(sub_data):
+        if val == target:
+            q.put((offset + local_i, True))
+            return
+    q.put((None, False))  # nothing found here
+
+
+def parallel_search(data, target, workers=4):
+    step = max(1, len(data) // workers)
+
+    slices  = [data[i:i + step] for i in range(0, len(data), step)]
+    offsets = [i               for i in range(0, len(data), step)]
+
     q = Queue()
-    processes = []
-    for chunk, off in zip(chunks, offsets):
-        p = Process(target=worker, args=(chunk, target, q, off))
+    procs = []
+
+    for chunk, off in zip(slices, offsets):
+        p = Process(target=search_chunk, args=(chunk, target, q, off))
         p.start()
-        processes.append(p)
-    
-    result_index = -1
-    for _ in processes:
+        procs.append(p)
+
+    found_index = -1
+    for _ in procs:
         idx, found = q.get()
         if found:
-            result_index = idx
-            break   # we have the first occurrence (lowest index)
-    
-    # Terminate all processes after first result
-    for p in processes:
+            found_index = idx
+            break
+
+    # clean up remaining processes
+    for p in procs:
         p.terminate()
         p.join()
-    
-    return result_index
+
+    return found_index

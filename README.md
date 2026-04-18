@@ -7,6 +7,7 @@ This project explores the performance differences between sequential and paralle
 ```bash
 python main_runner.py
 ```
+---
 
 # REFLECTION AND ANALYSIS
 
