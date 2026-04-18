@@ -1,37 +1,26 @@
 from multiprocessing import Pool
-from sequential_sort import sequential_sort   # reuse the merge sort
+from sequential_sort import sequential_sort, combine
 
-def sort_chunk(chunk):
-    return sequential_sort(chunk)
 
-def parallel_sort(data, num_processes=4):
-    """Parallel merge sort: split, sort each chunk, then merge."""
-    if len(data) < 1000:   # small fallback
+def sort_piece(piece):
+    # each worker just runs the sequential sort on its chunk
+    return sequential_sort(piece)
+
+
+def parallel_sort(data, workers=4):
+    # not worth spawning processes for tiny lists
+    if len(data) < 1000:
         return sequential_sort(data)
-    
-    chunk_size = max(1, len(data) // num_processes)
-    chunks = [data[i:i+chunk_size] for i in range(0, len(data), chunk_size)]
-    
-    with Pool(processes=num_processes) as pool:
-        sorted_chunks = pool.map(sort_chunk, chunks)
-    
-    # Merge sorted chunks sequentially
-    result = []
-    for chunk in sorted_chunks:
-        result = merge(result, chunk)   # reuse merge from sequential_sort
-    return result
 
-# We need the merge function (copy or import). For independence, we can define it here.
-def merge(left, right):
-    result = []
-    i = j = 0
-    while i < len(left) and j < len(right):
-        if left[i] <= right[j]:
-            result.append(left[i])
-            i += 1
-        else:
-            result.append(right[j])
-            j += 1
-    result.extend(left[i:])
-    result.extend(right[j:])
-    return result
+    step = max(1, len(data) // workers)
+    pieces = [data[i:i + step] for i in range(0, len(data), step)]
+
+    with Pool(processes=workers) as pool:
+        sorted_pieces = pool.map(sort_piece, pieces)
+
+    # merge all sorted chunks back into one list
+    final = []
+    for piece in sorted_pieces:
+        final = combine(final, piece)
+
+    return final
