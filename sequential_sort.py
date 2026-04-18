@@ -1,25 +1,32 @@
-def merge(left, right):
-    result = []
-    i = j = 0
-    while i < len(left) and j < len(right):
-        if left[i] <= right[j]:
-            result.append(left[i])
-            i += 1
+# merge sort – chosen because it splits cleanly for the parallel version later
+
+def combine(left, right):
+    merged = []
+    a, b = 0, 0
+
+    while a < len(left) and b < len(right):
+        if left[a] <= right[b]:
+            merged.append(left[a])
+            a += 1
         else:
-            result.append(right[j])
-            j += 1
-    result.extend(left[i:])
-    result.extend(right[j:])
-    return result
+            merged.append(right[b])
+            b += 1
+
+    # tack on whatever's left
+    merged.extend(left[a:])
+    merged.extend(right[b:])
+    return merged
+
 
 def merge_sort(arr):
     if len(arr) <= 1:
         return arr
+
     mid = len(arr) // 2
-    left = merge_sort(arr[:mid])
-    right = merge_sort(arr[mid:])
-    return merge(left, right)
+    left_half  = merge_sort(arr[:mid])
+    right_half = merge_sort(arr[mid:])
+    return combine(left_half, right_half)
+
 
 def sequential_sort(data):
-    """Public wrapper – returns a new sorted list (does not modify original)."""
     return merge_sort(data)
