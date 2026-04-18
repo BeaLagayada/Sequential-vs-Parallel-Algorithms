@@ -1,7 +1,7 @@
 # Sequential vs Parallel Algorithms – Group Project
 
 ## Overview
-This project implements and compares sequential vs parallel sorting (merge sort) and searching (linear search) using Python's multiprocessing. Datasets: 1k, 100k, 1M elements with random, sorted, and reverse sorted cases.
+This project explores the performance differences between sequential and parallel algorithms by implementing both a sorting algorithm (merge sort) and a searching algorithm (linear search) in Python. Using the multiprocessing module, the parallel versions divide the dataset into chunks that are processed concurrently, while the sequential versions handle everything in a single linear flow. Each algorithm is tested across three dataset sizes (1,000, 100,000, and 1,000,000 elements) and three data arrangements (random, sorted, and reverse sorted) to observe how execution time and efficiency change under different conditions. The goal is to understand not just how these algorithms work, but when parallelism actually helps and when it just adds unnecessary overhead.
 
 ## How to Run
 ```bash
@@ -16,3 +16,7 @@ From my perspective as the one running the tests, the biggest difference between
 
 ## Mariel Laplap 
 Working on sequential (linear) search helped me understand its role as a simple baseline for comparing performance with parallel approaches. I observed that while linear search is efficient for small datasets, its execution time becomes more noticeable as the dataset size increases since it checks each element one by one. Compared to the parallel version, the difference in speed becomes clearer with larger inputs, where dividing the task can reduce overall search time. This experience showed me that although sequential search is straightforward, it is not always the most efficient choice for large-scale problems.
+
+
+## Thomas Gabriel D. Martinez
+Working on the sequential search was honestly pretty simple at first since all it does is go through each element one by one until it finds the target. What got interesting was testing it against different dataset sizes. On small data it was fine, but on the 1,000,000 element dataset you could actually feel it slow down, especially when the target was near the end or not there at all. Comparing it to the parallel version was where things got more interesting because on the small dataset the sequential one was actually faster. Spinning up multiple processes and setting up a Queue just to search 1,000 numbers costs more than it saves. The parallel version only started pulling ahead on the larger datasets in worst case scenarios. So the big takeaway for me was that parallel is not always the smarter option, and for something as lightweight as a single comparison, you really need a massive dataset before the extra overhead is worth it.
